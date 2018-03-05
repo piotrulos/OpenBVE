@@ -937,6 +937,7 @@ namespace OpenBve {
 			int n = 0;
 			double a = -1.0;
 			bool NumberCheck = !IsRW;
+			bool ignoreNumbers = true;
 			for (int i = 0; i < Expressions.Length; i++) {
 				if (IsRW) {
 					// only check for track positions in the railway section for RW routes
@@ -947,6 +948,25 @@ namespace OpenBve {
 						} else {
 							NumberCheck = false;
 						}
+					}
+				}
+
+				else if (Interface.CurrentOptions.EnableBveTsHacks)
+				{
+					/*
+					 * Any expression containing solely a number not declared within the With Track section
+					 * causes all manner of things to break
+					 *
+					 */
+					if (Expressions[i].Text.StartsWith("With Track", StringComparison.InvariantCultureIgnoreCase))
+					{
+						ignoreNumbers = false;
+					}
+
+					double d;
+					if (NumberFormats.TryParseDoubleVb6(Expressions[i].Text, out d) && ignoreNumbers)
+					{
+						continue;
 					}
 				}
 				double x;
