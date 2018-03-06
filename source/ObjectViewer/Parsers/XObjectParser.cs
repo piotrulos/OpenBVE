@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using OpenBveApi.Colors;
 using OpenBveApi.Math;
+using OpenBveApi.Objects;
 
 namespace OpenBve {
 	internal static class XObjectParser {
@@ -1270,7 +1271,7 @@ namespace OpenBve {
 			Object = new ObjectManager.StaticObject();
 			Object.Mesh.Faces = new World.MeshFace[] { };
 			Object.Mesh.Materials = new World.MeshMaterial[] { };
-			Object.Mesh.Vertices = new World.Vertex[] { };
+			Object.Mesh.Vertices = new VertexTemplate[] { };
 			// file
 			for (int i = 0; i < Structure.Data.Length; i++) {
 				Structure f = Structure.Data[i] as Structure;
@@ -1336,7 +1337,7 @@ namespace OpenBve {
 								return false;
 							}
 							// collect vertices
-							World.Vertex[] Vertices = new World.Vertex[nVertices];
+							VertexTemplate[] Vertices = new VertexTemplate[nVertices];
 							for (int j = 0; j < nVertices; j++)
 							{
 								if (vertices[j].Name != "Vector")
@@ -1367,7 +1368,7 @@ namespace OpenBve {
 								double x = (double)vertices[j].Data[0];
 								double y = (double)vertices[j].Data[1];
 								double z = (double)vertices[j].Data[2];
-								Vertices[j].Coordinates = new Vector3(x, y, z);
+								Vertices[j] = new Vertex(new Vector3(x,y,z));
 							}
 							// collect faces
 							int[][] Faces = new int[nFaces][];
@@ -2009,7 +2010,7 @@ namespace OpenBve {
 											double red = (double)colorStructure.Data[0], green = (double)colorStructure.Data[1], blue = (double)colorStructure.Data[2], alpha = (double)colorStructure.Data[3];
 
 											OpenBveApi.Colors.Color128 c = new Color128((float)red, (float)green, (float)blue, (float)alpha);
-											Vertices[idx].VertexColor = c;
+											Vertices[idx] = new ColoredVertex((Vertex)Vertices[idx], c);
 										}
 										break;
 									case "MeshNormals":
@@ -2172,7 +2173,7 @@ namespace OpenBve {
 							int mv = Object.Mesh.Vertices.Length;
 							Array.Resize<World.MeshFace>(ref Object.Mesh.Faces, mf + nFaces);
 							Array.Resize<World.MeshMaterial>(ref Object.Mesh.Materials, mm + Materials.Length);
-							Array.Resize<World.Vertex>(ref Object.Mesh.Vertices, mv + Vertices.Length);
+							Array.Resize<VertexTemplate>(ref Object.Mesh.Vertices, mv + Vertices.Length);
 							for (int j = 0; j < Materials.Length; j++)
 							{
 								bool emissive = Materials[j].emissiveColor.R != 0 | Materials[j].emissiveColor.G != 0 | Materials[j].emissiveColor.B != 0;
